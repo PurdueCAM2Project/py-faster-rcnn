@@ -9,13 +9,21 @@
 
 __sets = {}
 
+from datasets.cam2 import cam2
 from datasets.pascal_voc import pascal_voc
+from datasets.imagenet import imagenet
 from datasets.coco import coco
 import numpy as np
 
+# Set up imagenet_<year>_<split>
+for year in ['2014']:
+    for split in ['train', 'val', 'val1', 'val2', 'test','short_train','very_short_train']:
+        name = 'imagenet_{}'.format(split)
+        __sets[name] = (lambda split=split: imagenet(split))
+
 # Set up voc_<year>_<split> using selective search "fast" mode
 for year in ['2007', '2012']:
-    for split in ['train', 'val', 'trainval', 'test']:
+    for split in ['train', 'val', 'trainval', 'test','val_small']:
         name = 'voc_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year: pascal_voc(split, year))
 
@@ -30,6 +38,12 @@ for year in ['2015']:
     for split in ['test', 'test-dev']:
         name = 'coco_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year: coco(split, year))
+
+# Set up cam2_2017_<split>
+for year in ['2017']:
+    for split in ['train','val','trainval','test']:
+        name = 'cam2_{}_{}'.format(year, split)
+        __sets[name] = (lambda split=split, year=year: cam2(split, year))
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""
