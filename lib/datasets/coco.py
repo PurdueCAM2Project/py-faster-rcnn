@@ -78,6 +78,8 @@ class coco(imdb):
         self._data_name = (self._view_map[coco_name]
                            if self._view_map.has_key(coco_name)
                            else coco_name)
+        if "test-dev2015" == self._data_name:
+            self._data_name = "test2015"
         # Dataset splits that have ground-truth annotations (test splits
         # do not have gt annotations)
         self._gt_splits = ('train', 'val', 'minival')
@@ -336,7 +338,9 @@ class coco(imdb):
     def _coco_results_one_category(self, boxes, cat_id):
         results = []
         for im_ind, index in enumerate(self.image_index):
-            dets = boxes[im_ind].astype(np.float)
+            dets = np.array(boxes[im_ind]).astype(np.float)
+            if len(dets) == 0:
+                continue
             if dets == []:
                 continue
             scores = dets[:, -1]
@@ -379,8 +383,9 @@ class coco(imdb):
         res_file += '.json'
         self._write_coco_results_file(all_boxes, res_file)
         # Only do evaluation on non-test sets
-        if self._image_set.find('test') == -1:
-            self._do_detection_eval(res_file, output_dir)
+        # if self._image_set.find('test') == -1:
+        #     self._do_detection_eval(res_file, output_dir)
+        self._do_detection_eval(res_file, output_dir)
         # Optionally cleanup results json file
         if self.config['cleanup']:
             os.remove(res_file)
