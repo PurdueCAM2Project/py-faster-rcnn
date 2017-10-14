@@ -5,7 +5,7 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-import os
+import os,sys
 from datasets.imdb import imdb
 import datasets.ds_utils as ds_utils
 import xml.etree.ElementTree as ET
@@ -20,10 +20,26 @@ from voc_eval import voc_eval
 from fast_rcnn.config import cfg
 
 class pascal_voc(imdb):
+
     def __init__(self, image_set, year, devkit_path=None):
         imdb.__init__(self, 'voc_' + year + '_' + image_set)
         self._year = year
         self._image_set = image_set
+        self._anno_set_dir = image_set
+        print(image_set)
+        if "val" in image_set:
+            self._image_set_dir = "val"
+            if "val1" in image_set:
+                self._anno_set_dir = "val1"
+            if "val2" in image_set:
+                self._anno_set_dir = "val2"
+        elif "train" in image_set:
+            self._anno_set_dir = "train"
+        elif "test" in image_set:
+            self._anno_set_dir = "test"
+        print(self._anno_set_dir)
+        
+
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
@@ -103,6 +119,7 @@ class pascal_voc(imdb):
             print '{} gt roidb loaded from {}'.format(self.name, cache_file)
             return roidb
 
+        
         gt_roidb = [self._load_pascal_annotation(index)
                     for index in self.image_index]
         with open(cache_file, 'wb') as fid:
@@ -127,7 +144,7 @@ class pascal_voc(imdb):
             print '{} ss roidb loaded from {}'.format(self.name, cache_file)
             return roidb
 
-        if int(self._year) == 2007 or self._image_set != 'test':
+        if int(self._year) == 2007 or int(self._year) == 2012 or self._image_set != 'test':
             gt_roidb = self.gt_roidb()
             ss_roidb = self._load_selective_search_roidb(gt_roidb)
             roidb = imdb.merge_roidbs(gt_roidb, ss_roidb)
@@ -140,7 +157,7 @@ class pascal_voc(imdb):
         return roidb
 
     def rpn_roidb(self):
-        if int(self._year) == 2007 or self._image_set != 'test':
+        if int(self._year) == 2007 or init(self._year) == 2012 or self._image_set != 'test':
             gt_roidb = self.gt_roidb()
             rpn_roidb = self._load_rpn_roidb(gt_roidb)
             roidb = imdb.merge_roidbs(gt_roidb, rpn_roidb)
@@ -209,6 +226,7 @@ class pascal_voc(imdb):
             y1 = float(bbox.find('ymin').text) - 1
             x2 = float(bbox.find('xmax').text) - 1
             y2 = float(bbox.find('ymax').text) - 1
+            #cls = self._class_to_ind['person']
             cls = self._class_to_ind[obj.find('name').text.lower().strip()]
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
@@ -241,21 +259,32 @@ class pascal_voc(imdb):
 
     def _write_voc_results_file(self, all_boxes):
         for cls_ind, cls in enumerate(self.classes):
+            count = 0
+            det_count = 0
             if cls == '__background__':
                 continue
             print 'Writing {} VOC results file'.format(cls)
             filename = self._get_voc_results_file_template().format(cls)
+            #det_count = 0
+            #count = 0
             with open(filename, 'wt') as f:
                 for im_ind, index in enumerate(self.image_index):
                     dets = all_boxes[cls_ind][im_ind]
-                    if dets == []:
+                    #det_count = det_count + dets.size
+                    #print("{} : {}".format(cls,dets.size))
+                    if len(dets) == 0:
                         continue
                     # the VOCdevkit expects 1-based indices
+
                     for k in xrange(dets.shape[0]):
+                        #count = count + 1
                         f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
                                 format(index, dets[k, -1],
                                        dets[k, 0] + 1, dets[k, 1] + 1,
                                        dets[k, 2] + 1, dets[k, 3] + 1))
+            #TODO : verify if the "+1" if is correct
+            #print "Wrote {} annotations to {}".format(count,filename)
+            #print "The number of non-zero det classes: {}".format(det_count)
 
     def _do_python_eval(self, output_dir = 'output'):
         annopath = os.path.join(
@@ -269,7 +298,7 @@ class pascal_voc(imdb):
             'ImageSets',
             'Main',
             self._image_set + '.txt')
-        cachedir = os.path.join(self._devkit_path, 'annotations_cache')
+        cachedir = os.path.join(self._devkit_path, 'annotations_cache',self._anno_set_dir)
         aps = []
         # The PASCAL VOC metric changed in 2010
         use_07_metric = True if int(self._year) < 2010 else False
@@ -280,19 +309,38 @@ class pascal_voc(imdb):
             if cls == '__background__':
                 continue
             filename = self._get_voc_results_file_template().format(cls)
-            rec, prec, ap = voc_eval(
+            rec, prec, ap, ovthresh = voc_eval(
                 filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
                 use_07_metric=use_07_metric)
             aps += [ap]
-            print('AP for {} = {:.4f}'.format(cls, ap))
+        aps = np.array(aps)
+        print(aps)
+        print(aps.shape)
+        for kdx in range(len(ovthresh)):
+            #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
+            #print('AP for {} = {:.4f}'.format(cls, ap))
+            print(kdx)
+            print(np.mean(aps[:,kdx]))
+            print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
+
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
                 cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
-        print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        #print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        for kdx in range(len(ovthresh)):
+            #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
+            print('Mean AP = {:.4f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
         print('~~~~~~~~')
         print('Results:')
+        count_ = 1
         for ap in aps:
-            print('{:.3f}'.format(ap))
-        print('{:.3f}'.format(np.mean(aps)))
+            sys.stdout.write('{}: '.format(count_))
+            for kdx in range(len(ovthresh)):
+                sys.stdout.write('{0:.5f} @ {1:.2f}\t'.format(ap[kdx],ovthresh[kdx]))
+            sys.stdout.write('\n')
+            count_ +=1
+        for kdx in range(len(ovthresh)):
+            #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
+            print('{:.5f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
         print('~~~~~~~~')
         print('')
         print('--------------------------------------------------------------')
