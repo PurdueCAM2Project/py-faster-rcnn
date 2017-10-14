@@ -29,7 +29,7 @@ class Corg(caffe.Layer):
         self._bbox_indicies = np.empty(len(self._prob_indicies)*4,dtype=np.int)
         
         # make the bbox indicies expand to capture 4 indicies
-        print(self._prob_indicies)
+        #print(self._prob_indicies)
         
         for index in range(len(self._prob_indicies)):
             bbox_index = 4*index

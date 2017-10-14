@@ -28,15 +28,16 @@ def parse_rec(filename):
 
     return objects
 
-def voc_ap(rec, prec, clsnm,use_07_metric=False):
+def voc_ap(rec, prec, clsnm,use_07_metric=False,viz=False):
     """ ap = voc_ap(rec, prec, [use_07_metric])
     Compute VOC AP given precision and recall.
     If use_07_metric is true, uses the
     VOC 07 11 point method (default:False).
     """
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
+    if viz:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
 
     use_07_metric = True
 
@@ -68,15 +69,16 @@ def voc_ap(rec, prec, clsnm,use_07_metric=False):
         # and sum (\Delta recall) * prec
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
-        #plt.plot(mrec,mpre,"ro",mrec,ap,"g^")
-        # plt.plot(mrec,mpre,"r+")
-        # plt.tight_layout()
-        # plt.xlabel('Recall')
-        # plt.ylabel('Precision')
-        # plt.title("AP{}".format(ap))
-        # plt.savefig(clsnm + "_apPlt.png")        
-        # plt.clf()
-        #time.sleep(30)
+        if viz:
+            plt.plot(mrec,mpre,"ro",mrec,ap,"g^")
+            plt.plot(mrec,mpre,"r+")
+            plt.tight_layout()
+            plt.xlabel('Recall')
+            plt.ylabel('Precision')
+            plt.title("AP{}".format(ap))
+            plt.savefig(clsnm + "_apPlt.png")        
+            # plt.clf()
+            # time.sleep(30)
 
     return ap
 
@@ -162,7 +164,8 @@ def voc_eval(detpath,
     sorted_ind = np.argsort(-confidence)
     sorted_scores = np.sort(-confidence)
     if len(BB) == 0:
-        return 0,0,0
+        print("no predicted boxes")
+        return 0,0,0,0
     BB = BB[sorted_ind, :]
     image_ids = [image_ids[x] for x in sorted_ind]
 
@@ -245,6 +248,5 @@ def voc_eval(detpath,
         #ap = voc_ap(rec, prec, use_07_metric)
         ap[idx] = voc_ap(rec[:,idx], prec[:,idx], classname, False)
 
-    print(ap)
     #print(fp,tp,rec,prec,ap,npos)
     return rec, prec, ap, ovthresh

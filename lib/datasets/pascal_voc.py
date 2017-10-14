@@ -26,7 +26,6 @@ class pascal_voc(imdb):
         self._year = year
         self._image_set = image_set
         self._anno_set_dir = image_set
-        print(image_set)
         if "val" in image_set:
             self._image_set_dir = "val"
             if "val1" in image_set:
@@ -37,7 +36,6 @@ class pascal_voc(imdb):
             self._anno_set_dir = "train"
         elif "test" in image_set:
             self._anno_set_dir = "test"
-        print(self._anno_set_dir)
         
 
         self._devkit_path = self._get_default_path() if devkit_path is None \
@@ -260,6 +258,7 @@ class pascal_voc(imdb):
     def _write_voc_results_file(self, all_boxes):
         for cls_ind, cls in enumerate(self.classes):
             count = 0
+            skip_count = 0
             det_count = 0
             if cls == '__background__':
                 continue
@@ -273,6 +272,7 @@ class pascal_voc(imdb):
                     #det_count = det_count + dets.size
                     #print("{} : {}".format(cls,dets.size))
                     if len(dets) == 0:
+                        skip_count+=1
                         continue
                     # the VOCdevkit expects 1-based indices
 
@@ -285,6 +285,7 @@ class pascal_voc(imdb):
             #TODO : verify if the "+1" if is correct
             #print "Wrote {} annotations to {}".format(count,filename)
             #print "The number of non-zero det classes: {}".format(det_count)
+            #print("{}: skipped {} of {}".format(cls_ind,skip_count,len(all_boxes[cls_ind])))
 
     def _do_python_eval(self, output_dir = 'output'):
         annopath = os.path.join(
@@ -314,33 +315,48 @@ class pascal_voc(imdb):
                 use_07_metric=use_07_metric)
             aps += [ap]
         aps = np.array(aps)
-        print(aps)
-        print(aps.shape)
-        for kdx in range(len(ovthresh)):
-            #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
-            #print('AP for {} = {:.4f}'.format(cls, ap))
-            print(kdx)
-            print(np.mean(aps[:,kdx]))
-            print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
+        # for kdx in range(len(ovthresh)):
+        #     #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
+        #     #print('AP for {} = {:.4f}'.format(cls, ap))
+        #     print(kdx)
+        #     print(np.mean(aps[:,kdx]))
+        #     print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
 
-            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
-                cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
+        #     with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
+        #         cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
         #print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        results_fd = open("./results_voc.txt","w")
         for kdx in range(len(ovthresh)):
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
             print('Mean AP = {:.4f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
         print('~~~~~~~~')
         print('Results:')
         count_ = 1
+        sys.stdout.write('{0:>15} (#):'.format("class AP"))
+        results_fd.write('{0:>15} (#):'.format("class AP"))
+        for thsh in ovthresh:
+            sys.stdout.write("\t{:>5}{:.3f}".format("@",thsh))
+            results_fd.write("\t{:>5}{:.3f}".format("@",thsh))
+        sys.stdout.write("\n")
+        results_fd.write("\n")
         for ap in aps:
-            sys.stdout.write('{}: '.format(count_))
+            sys.stdout.write('{:>15} ({}):'.format(self._classes[count_],count_))
+            results_fd.write('{:>15} ({}):'.format(self._classes[count_],count_))
             for kdx in range(len(ovthresh)):
-                sys.stdout.write('{0:.5f} @ {1:.2f}\t'.format(ap[kdx],ovthresh[kdx]))
+                sys.stdout.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
+                results_fd.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
             sys.stdout.write('\n')
+            results_fd.write('\n')
             count_ +=1
+        sys.stdout.write('{:>15}:'.format("mAP"))
+        results_fd.write('{:>15}:'.format("mAP"))
         for kdx in range(len(ovthresh)):
+            sys.stdout.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
+            results_fd.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
-            print('{:.5f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
+            #print('mAP @ {:.2f}: {:.5f} '.format(ovthresh[kdx],np.mean(aps[:,kdx])))
+        sys.stdout.write('\n')
+        results_fd.write('\n')
         print('~~~~~~~~')
         print('')
         print('--------------------------------------------------------------')
