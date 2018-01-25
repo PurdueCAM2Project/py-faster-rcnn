@@ -16,6 +16,8 @@ import os
 
 from caffe.proto import caffe_pb2
 import google.protobuf as pb2
+import google.protobuf.text_format
+
 
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
@@ -24,7 +26,7 @@ class SolverWrapper(object):
     """
 
     def __init__(self, solver_prototxt, roidb, output_dir,
-                 pretrained_model=None):
+                 pretrained_model=None, solver_state=None):
         """Initialize the SolverWrapper."""
         self.output_dir = output_dir
 
@@ -41,6 +43,11 @@ class SolverWrapper(object):
             print 'done'
 
         self.solver = caffe.SGDSolver(solver_prototxt)
+        
+        if solver_state is not None:
+            print("Loading solver state from {:s}".format(solver_state))
+            self.solver.restore(solver_state)
+
         if pretrained_model is not None:
             print ('Loading pretrained model '
                    'weights from {:s}').format(pretrained_model)
@@ -81,8 +88,19 @@ class SolverWrapper(object):
                     '_iter_{:d}'.format(self.solver.iter) + '.caffemodel')
         filename = os.path.join(self.output_dir, filename)
 
+        # save network
         net.save(str(filename))
         print 'Wrote snapshot to: {:s}'.format(filename)
+
+        # save solverstate 
+        filename = (self.solver_param.snapshot_prefix + infix +
+                    '_iter_{:d}'.format(self.solver.iter) + '.solverstate')
+        filename = os.path.join(self.output_dir, filename)
+
+        self.solver.save(str(filename))
+
+        print 'Wrote snapshot of solversate to: {:s}'\
+            .format(filename)
 
         if scale_bbox_params:
             # restore net to original state
@@ -95,6 +113,8 @@ class SolverWrapper(object):
         last_snapshot_iter = -1
         timer = Timer()
         model_paths = []
+
+        print(self.snapshot())
         while self.solver.iter < max_iters:
             # Make one SGD update
             timer.tic()
@@ -149,13 +169,13 @@ def filter_roidb(roidb):
     return filtered_roidb
 
 def train_net(solver_prototxt, roidb, output_dir,
-              pretrained_model=None, max_iters=40000):
+              pretrained_model=None, solver_state=None, max_iters=40000):
     """Train a Fast R-CNN network."""
 
     roidb = filter_roidb(roidb)
     sw = SolverWrapper(solver_prototxt, roidb, output_dir,
-                       pretrained_model=pretrained_model)
-
+                       pretrained_model=pretrained_model,
+                       solver_state=solver_state)
     print 'Solving...'
     model_paths = sw.train_model(max_iters)
     print 'done solving'

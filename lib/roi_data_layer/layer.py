@@ -11,6 +11,7 @@ RoIDataLayer implements a Caffe Python layer.
 """
 
 import caffe
+from utils.timer import Timer
 from fast_rcnn.config import cfg
 from roi_data_layer.minibatch import get_minibatch
 import numpy as np
@@ -141,7 +142,10 @@ class RoIDataLayer(caffe.Layer):
 
     def forward(self, bottom, top):
         """Get blobs and copy them into this layer's top blob vector."""
+        # timer = Timer()
+        # timer.tic()
         blobs = self._get_next_minibatch()
+        # print(timer.toc())
 
         for blob_name, blob in blobs.iteritems():
             top_ind = self._name_to_top_map[blob_name]

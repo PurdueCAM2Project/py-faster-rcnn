@@ -152,12 +152,19 @@ def voc_eval(detpath,
     confidence = np.array([float(x[1]) for x in splitlines])
     BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
 
+    # prep variables for eval
+    ovthresh = [0.5,0.75,0.95]
+    nd = len(image_ids)
+    tp = np.zeros((nd,len(ovthresh)))
+    fp = np.zeros((nd,len(ovthresh)))
+
+
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
     sorted_scores = np.sort(-confidence)
     if len(BB) == 0:
         print("len BB == 0")
-        return 0,0,0
+        return [ [ 0 for _ in range(len(ovthresh))] for __ in range(4) ]
     else:
         print("length = " + str(len(BB)))
     BB = BB[sorted_ind, :]
@@ -167,10 +174,6 @@ def voc_eval(detpath,
     # nd = len(image_ids)
     # tp = np.zeros(nd)
     # fp = np.zeros(nd)
-    ovthresh = [0.5,0.75,0.95]
-    nd = len(image_ids)
-    tp = np.zeros((nd,len(ovthresh)))
-    fp = np.zeros((nd,len(ovthresh)))
 
     for d in range(nd):
         #print(class_recs)

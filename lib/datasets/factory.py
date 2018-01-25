@@ -9,6 +9,10 @@
 
 __sets = {}
 
+from datasets.inria import inria
+from datasets.kitti import kitti
+from datasets.caltech import caltech
+from datasets.sun import sun
 from datasets.cam2 import cam2
 from datasets.pascal_voc import pascal_voc
 from datasets.imagenet import imagenet
@@ -17,7 +21,7 @@ import numpy as np
 
 # Set up imagenet_<year>_<split>
 for year in ['2014']:
-    for split in ['train', 'val', 'val1', 'val2', 'test','short_train','very_short_train']:
+    for split in ['train', 'val', 'val1', 'val2', 'test','short_train','very_short_train','val1_short']:
         name = 'imagenet_{}'.format(split)
         __sets[name] = (lambda split=split: imagenet(split))
 
@@ -41,9 +45,33 @@ for year in ['2015']:
 
 # Set up cam2_2017_<split>
 for year in ['2017']:
-    for split in ['train','val','trainval','test']:
+    for split in ['train','val','trainval','test','all']:
         name = 'cam2_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year: cam2(split, year))
+
+# Set up sun_2012_<split>
+for year in ['2012']:
+    for split in ['taste','all','test','train']:
+        name = 'sun_{}_{}'.format(year, split)
+        __sets[name] = (lambda split=split, year=year: sun(split, year))
+
+# Set up caltech_2009_<split>
+for year in ['2009']:
+    for split in ['val','train','test','all','taste','medium']:
+        name = 'caltech_{}_{}'.format(year, split)
+        __sets[name] = (lambda split=split, year=year: caltech(split, year))
+
+# Set up kitti_2013_<split>
+for year in ['2013']:
+    for split in ['val','train','all']:
+        name = 'kitti_{}_{}'.format(year, split)
+        __sets[name] = (lambda split=split, year=year: kitti(split, year))
+
+# Set up inria_2005_<split> # TODO
+for year in ['2005']:
+    for split in ['val','train','test','all']:
+        name = 'inria_{}_{}'.format(year, split)
+        __sets[name] = (lambda split=split, year=year: inria(split, year))
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""

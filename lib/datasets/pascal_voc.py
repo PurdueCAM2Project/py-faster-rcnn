@@ -315,16 +315,6 @@ class pascal_voc(imdb):
                 use_07_metric=use_07_metric)
             aps += [ap]
         aps = np.array(aps)
-        # for kdx in range(len(ovthresh)):
-        #     #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
-        #     #print('AP for {} = {:.4f}'.format(cls, ap))
-        #     print(kdx)
-        #     print(np.mean(aps[:,kdx]))
-        #     print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
-
-        #     with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
-        #         cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
-        #print('Mean AP = {:.4f}'.format(np.mean(aps)))
         results_fd = open("./results_voc.txt","w")
         for kdx in range(len(ovthresh)):
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))

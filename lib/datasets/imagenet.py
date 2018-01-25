@@ -306,37 +306,40 @@ class imagenet(imdb):
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
                 cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
         #print('Mean AP = {:.4f}'.format(np.mean(aps)))
-        aps = np.array(aps)
         print(aps)
-        print(aps.shape)
-        for kdx in range(len(ovthresh)):
-            #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
-            #print('AP for {} = {:.4f}'.format(cls, ap))
-            print(kdx)
-            print(np.mean(aps[:,kdx]))
-            print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
-
-            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
-                cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
-        #print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        aps = np.array(aps)
+        results_fd = open("./results_imagenet.txt","w")
         for kdx in range(len(ovthresh)):
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
             print('Mean AP = {:.4f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
         print('~~~~~~~~')
         print('Results:')
+        sys.stdout.write('{0:>15} (#):'.format("class AP"))
+        results_fd.write('{0:>15} (#):'.format("class AP"))
+        for thsh in ovthresh:
+            sys.stdout.write("\t{:>5}{:.3f}".format("@",thsh))
+            results_fd.write("\t{:>5}{:.3f}".format("@",thsh))
+        sys.stdout.write("\n")
+        results_fd.write("\n")
         count_ = 1
         for ap in aps:
-            sys.stdout.write('{}: '.format(count_))
+            sys.stdout.write('{:>15} ({}):'.format(self._classes[count_],count_))
+            results_fd.write('{:>15} ({}):'.format(self._classes[count_],count_))
             for kdx in range(len(ovthresh)):
-                sys.stdout.write('{0:.5f} @ {1:.2f}\t'.format(ap[kdx],ovthresh[kdx]))
+                sys.stdout.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
+                results_fd.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
             sys.stdout.write('\n')
+            results_fd.write('\n')
             count_ +=1
+        sys.stdout.write('{:>15}:'.format("mAP"))
+        results_fd.write('{:>15}:'.format("mAP"))
         for kdx in range(len(ovthresh)):
+            sys.stdout.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
+            results_fd.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
-            print('{:.5f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
-        # for ap in aps:
-        #     print('{:.3f}'.format(ap))
-        # print('{:.3f}'.format(np.mean(aps)))
+            #print('mAP @ {:.2f}: {:.5f} '.format(ovthresh[kdx],np.mean(aps[:,kdx])))
+        sys.stdout.write('\n')
+        results_fd.write('\n')
         print('~~~~~~~~')
         print('')
         print('--------------------------------------------------------------')

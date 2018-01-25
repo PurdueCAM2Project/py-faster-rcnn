@@ -24,19 +24,32 @@ class cam2(imdb):
         imdb.__init__(self, 'cam2_' + year + '_' + image_set)
         self._year = year
         self._image_set = image_set
+
+        self._anno_set_dir = image_set
+        if "val" in image_set:
+            self._image_set_dir = "val"
+            if "val1" in image_set:
+                self._anno_set_dir = "val1"
+            if "val2" in image_set:
+                self._anno_set_dir = "val2"
+        elif "train" in image_set:
+            self._anno_set_dir = "train"
+        elif "test" in image_set:
+            self._anno_set_dir = "test"
+
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
         self._data_path = os.path.join(self._devkit_path, 'CAM2_' + self._year)
 
-        self._classes = ('__background__', # always index 0
-                         'aeroplane', 'bicycle', 'bird', 'boat',
-                         'bottle', 'bus', 'car', 'cat', 'chair',
-                         'cow', 'diningtable', 'dog', 'horse',
-                         'motorbike', 'person', 'pottedplant',
-                         'sheep', 'sofa', 'train', 'tvmonitor')
-
         # self._classes = ('__background__', # always index 0
-        #                  'person')
+        #                  'aeroplane', 'bicycle', 'bird', 'boat',
+        #                  'bottle', 'bus', 'car', 'cat', 'chair',
+        #                  'cow', 'diningtable', 'dog', 'horse',
+        #                  'motorbike', 'person', 'pottedplant',
+        #                  'sheep', 'sofa', 'train', 'tvmonitor')
+
+        self._classes = ('__background__', # always index 0
+                         'person')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -214,7 +227,7 @@ class cam2(imdb):
                 y1 = float(bbox.find('ymin').text) - 1
                 x2 = float(bbox.find('xmax').text) - 1
                 y2 = float(bbox.find('ymax').text) - 1
-                cls = "person"#self._class_to_ind["person"]
+                cls = self._class_to_ind["person"]
                 boxes[ix, :] = [x1, y1, x2, y2]
                 gt_classes[ix] = cls
                 overlaps[ix, cls] = 1.0
@@ -276,7 +289,7 @@ class cam2(imdb):
             'ImageSets',
             'Main',
             self._image_set + '.txt')
-        cachedir = os.path.join(self._devkit_path, 'annotations_cache')
+        cachedir = os.path.join(self._devkit_path, 'annotations_cache',self._anno_set_dir)
         aps = []
         # The PASCAL VOC metric changed in 2010
         use_07_metric = True if int(self._year) < 2010 else False
@@ -296,33 +309,38 @@ class cam2(imdb):
                     use_07_metric=use_07_metric)
                 aps += [ap]
         aps = np.array(aps)
-        print(aps)
-        print(aps.shape)
-        for kdx in range(len(ovthresh)):
-            #print('{0:.3f}@{1:.2f}'.format(ap[idx],ovthresh[idx]))
-            #print('AP for {} = {:.4f}'.format(cls, ap))
-            print(kdx)
-            print(np.mean(aps[:,kdx]))
-            print('AP for {} =  {:.4f} @ {:.2f}'.format(cls, np.mean(aps[:,kdx]),ovthresh[kdx]))
-
-            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
-                cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
-        #print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        results_fd = open("./results_cam2.txt","w")
         for kdx in range(len(ovthresh)):
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
             print('Mean AP = {:.4f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
         print('~~~~~~~~')
         print('Results:')
         count_ = 1
+        sys.stdout.write('{0:>15} (#):'.format("class AP"))
+        results_fd.write('{0:>15} (#):'.format("class AP"))
+        for thsh in ovthresh:
+            sys.stdout.write("\t{:>5}{:.3f}".format("@",thsh))
+            results_fd.write("\t{:>5}{:.3f}".format("@",thsh))
+        sys.stdout.write("\n")
+        results_fd.write("\n")
         for ap in aps:
-            sys.stdout.write('{}: '.format(count_))
+            sys.stdout.write('{:>15} ({}):'.format(self._classes[count_],count_))
+            results_fd.write('{:>15} ({}):'.format(self._classes[count_],count_))
             for kdx in range(len(ovthresh)):
-                sys.stdout.write('{0:.5f} @ {1:.2f}\t'.format(ap[kdx],ovthresh[kdx]))
+                sys.stdout.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
+                results_fd.write('\t{0:>10.5f}'.format(ap[kdx],ovthresh[kdx]))
             sys.stdout.write('\n')
+            results_fd.write('\n')
             count_ +=1
+        sys.stdout.write('{:>15}:'.format("mAP"))
+        results_fd.write('{:>15}:'.format("mAP"))
         for kdx in range(len(ovthresh)):
+            sys.stdout.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
+            results_fd.write('\t{:10.5f}'.format(np.mean(aps[:,kdx])))
             #print('{0:.3f}@{1:.2f}'.format(ap[kdx],ovthresh[kdx]))
-            print('{:.5f} @ {:.2f}'.format(np.mean(aps[:,kdx]),ovthresh[kdx]))
+            #print('mAP @ {:.2f}: {:.5f} '.format(ovthresh[kdx],np.mean(aps[:,kdx])))
+        sys.stdout.write('\n')
+        results_fd.write('\n')
         print('~~~~~~~~')
         print('')
         print('--------------------------------------------------------------')

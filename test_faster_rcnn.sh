@@ -35,16 +35,16 @@ EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 case $DATASET in
     imagenet)
-	TRAIN_IMDB="imagenet_val2"
+	TRAIN_IMDB="imagenet_train"
 	#TEST_IMDB="imagenet_test"
 	#TEST_IMDB="imagenet_very_short_train"
-	TEST_IMDB="imagenet_val2"
+	TEST_IMDB="imagenet_val1"
 	PT_DIR="imagenet"
 	ITERS=100000
 	;;
     pascal_voc)
 	TRAIN_IMDB="voc_2007_trainval"
-	TEST_IMDB="voc_2007_val"
+	TEST_IMDB="voc_2007_test"
 	PT_DIR="pascal_voc"
 	ITERS=70000
 	;;
@@ -59,16 +59,36 @@ case $DATASET in
 	# You can probably use fewer iterations and reduce the
 	# time to the LR drop (set in the solver to 350,000 iterations).
 	TRAIN_IMDB="coco_2014_train"
-	TEST_IMDB="coco_2014_minival"
+	TEST_IMDB="coco_2014_val"
 	PT_DIR="coco"
 	ITERS=490000
 	;;
     cam2)
 	# this is cam2 data :-)
 	TRAIN_IMDB="cam2_2017_trainval"
-	TEST_IMDB="cam2_2017_test" #"cam2_2017_trainval"
+	#TEST_IMDB="cam2_2017_test" #"cam2_2017_trainval"
+	TEST_IMDB="cam2_2017_all" #"cam2_2017_trainval"
 	PT_DIR="cam2"
 	ITERS=10000
+	;;
+    sun)
+	TRAIN_IMDB="sun_2012_train"
+	#TEST_IMDB="sun_2012_taste"
+	TEST_IMDB="sun_2012_test"
+	PT_DIR="sun"
+	ITERS=10000
+	;;
+    caltech)
+	TRAIN_IMDB="caltech_2009_train"
+	TEST_IMDB="caltech_2009_test"
+	PT_DIR="caltech"
+	ITERS=10000
+	;;
+    kitti)
+	TRAIN_IMDB="kitti_2013_train"
+	TEST_IMDB="kitti_2013_val"
+	PT_DIR="kitti"
+	ITERS=70000
 	;;
     *)
 	echo "No dataset given"
@@ -84,6 +104,8 @@ esac
 #   --imdb ${TEST_IMDB} \
 #   --cfg experiments/cfgs/faster_rcnn_end2end.yml \
 #   ${EXTRA_ARGS}
+
+# CORG says: "The original model is trained on the loaded corg file."
 
 if [ "${CORG_DIR}" != "" ]; then
     echo "corg"

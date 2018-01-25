@@ -308,8 +308,12 @@ class coco(imdb):
         precision = \
             coco_eval.eval['precision'][ind_lo:(ind_hi + 1), :, :, 0, 2]
         ap_default = np.mean(precision[precision > -1])
+        results_fd = open("./results_coco.txt","w")
+        results_fd.write('~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] '
+               '~~~~\n'.format(IoU_lo_thresh, IoU_hi_thresh))
         print ('~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] '
-               '~~~~').format(IoU_lo_thresh, IoU_hi_thresh)
+               '~~~~'.format(IoU_lo_thresh, IoU_hi_thresh))
+        results_fd.write('{:.1f}\n'.format(100 * ap_default))
         print '{:.1f}'.format(100 * ap_default)
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
@@ -317,10 +321,14 @@ class coco(imdb):
             # minus 1 because of __background__
             precision = coco_eval.eval['precision'][ind_lo:(ind_hi + 1), :, cls_ind - 1, 0, 2]
             ap = np.mean(precision[precision > -1])
+            results_fd.write('{:.1f}\n'.format(100 * ap))
             print '{:.1f}'.format(100 * ap)
 
         print '~~~~ Summary metrics ~~~~'
-        coco_eval.summarize()
+        results_fd.write('~~~~ Summary metrics ~~~~\n')
+        summary_str = coco_eval.summarize()
+        results_fd.write(summary_str)
+        
 
     def _do_detection_eval(self, res_file, output_dir):
         ann_type = 'bbox'

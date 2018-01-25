@@ -24,6 +24,7 @@ class Corg(caffe.Layer):
         layer_params = yaml.load(self.param_str_)
         
 
+        self._norm = np.array(layer_params['norm'])
         self._prob_indicies = np.array(layer_params['indicies'])
         self._nclasses = layer_params.get('nclasses', len(self._prob_indicies))
         self._bbox_indicies = np.empty(len(self._prob_indicies)*4,dtype=np.int)
@@ -41,6 +42,9 @@ class Corg(caffe.Layer):
         # reshape the top to be the size of the number of output classes
         top[0].reshape(1,len(self._prob_indicies))
         top[1].reshape(1,len(self._bbox_indicies))
+        print(self._bbox_indicies)
+        print(len(self._bbox_indicies))
+        print(len(self._prob_indicies))
         if len(self._prob_indicies) > self._nclasses:
             raise ValueError("Number of classes must be >= length of the index vector")
 
@@ -55,6 +59,9 @@ class Corg(caffe.Layer):
         blob_box = box_preds[:,self._bbox_indicies]
         blob_probs = probs[:,self._prob_indicies]
 
+        if self._norm == True:
+            blob_probs = blob_probs / np.sum(blob_probs,1)[:,np.newaxis]
+        
         top[0].reshape(blob_probs.shape[0],self._nclasses)
         top[0].data[0:blob_probs.shape[0],0:blob_probs.shape[1]] = blob_probs
 

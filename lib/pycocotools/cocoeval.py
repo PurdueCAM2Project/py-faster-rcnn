@@ -406,24 +406,39 @@ class COCOeval:
                 mean_s = -1
             else:
                 mean_s = np.mean(s[s>-1])
-            print iStr.format(titleStr, typeStr, iouStr, areaStr, maxDetsStr, '%.3f'%(float(mean_s)))
-            return mean_s
+            _rstr=iStr.format(titleStr, typeStr, iouStr, areaStr, maxDetsStr, '%.3f'%(float(mean_s)))
+            print _rstr
+            return mean_s,_rstr
 
         if not self.eval:
             raise Exception('Please run accumulate() first')
         self.stats = np.zeros((12,))
-        self.stats[0] = _summarize(1)
-        self.stats[1] = _summarize(1,iouThr=.5)
-        self.stats[2] = _summarize(1,iouThr=.75)
-        self.stats[3] = _summarize(1,areaRng='small')
-        self.stats[4] = _summarize(1,areaRng='medium')
-        self.stats[5] = _summarize(1,areaRng='large')
-        self.stats[6] = _summarize(0,maxDets=1)
-        self.stats[7] = _summarize(0,maxDets=10)
-        self.stats[8] = _summarize(0,maxDets=100)
-        self.stats[9]  = _summarize(0,areaRng='small')
-        self.stats[10] = _summarize(0,areaRng='medium')
-        self.stats[11] = _summarize(0,areaRng='large')
+        rstr = ""
+        self.stats[0],_ = _summarize(1)
+        rstr += _ + "\n"
+        self.stats[1],_ = _summarize(1,iouThr=.5)
+        rstr += _ + "\n"
+        self.stats[2],_ = _summarize(1,iouThr=.75)
+        rstr += _ + "\n"
+        self.stats[3],_ = _summarize(1,areaRng='small')
+        rstr += _ + "\n"
+        self.stats[4],_ = _summarize(1,areaRng='medium')
+        rstr += _ + "\n"
+        self.stats[5],_ = _summarize(1,areaRng='large')
+        rstr += _ + "\n"
+        self.stats[6],_ = _summarize(0,maxDets=1)
+        rstr += _ + "\n"
+        self.stats[7],_ = _summarize(0,maxDets=10)
+        rstr += _ + "\n"
+        self.stats[8],_ = _summarize(0,maxDets=100)
+        rstr += _ + "\n"
+        self.stats[9],_  = _summarize(0,areaRng='small')
+        rstr += _ + "\n"
+        self.stats[10],_ = _summarize(0,areaRng='medium')
+        rstr += _ + "\n"
+        self.stats[11],_ = _summarize(0,areaRng='large')
+        rstr += _ + "\n"
+        return rstr
 
     def __str__(self):
         self.summarize()

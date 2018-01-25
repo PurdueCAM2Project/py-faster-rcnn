@@ -1,0 +1,189 @@
+##########################################################################################
+-=-=-=-=- Information about the training of Faster-RCNN on ImageNet -=-=-=-=-
+##########################################################################################
+
+
+####################
+-=-=- ImageNet -=-=-
+####################
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations: about 400k
+Rational: at 400k, the ap@95 stopped increasing
+Plotting: 'plot_imagenet.p' (uncomment the "#*.png" command)
+File: "imagenet_validation.png"
+
+-=-=- COCO -=-=-
+
+Person AP:
+
+-=-=- VOC -=-=-
+
+Person AP:
+
+-=-=- SUN -=-=-
+
+Person AP:
+
+-=-=- Caltech Pedestrian -=-=-
+
+Person AP:
+
+-=-=- CAM2 -=-=-
+
+Person AP:
+
+-=-=- INRIA -=-=-
+
+Person AP:
+
+-=-=- KITTI -=-=-
+
+Person AP:
+
+################
+-=-=- COCO -=-=-
+################
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations:
+Rational:
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- VOC -=-=-
+
+-=-=- SUN -=-=-
+
+-=-=- Caltech Pedestrian -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+-=-=- KITTI -=-=-
+
+###############
+-=-=- VOC -=-=-
+###############
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations:
+Rational:
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- COCO -=-=-
+
+-=-=- SUN -=-=-
+
+-=-=- Caltech Pedestrian -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+-=-=- KITTI -=-=-
+
+
+###############
+-=-=- SUN -=-=-
+###############
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations:
+Rational:
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- COCO -=-=-
+
+-=-=- VOC -=-=-
+
+-=-=- Caltech Pedestrian -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+-=-=- KITTI -=-=-
+
+
+##############################
+-=-=- Caltech Pedestrian -=-=-
+##############################
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+
+Iterations:
+Rational:
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- COCO -=-=-
+
+-=-=- VOC -=-=-
+
+-=-=- SUN -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+-=-=- KITTI -=-=-
+
+
+#################
+-=-=- KITTI -=-=-
+#################
+
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations:
+Rational:
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- COCO -=-=-
+
+-=-=- VOC -=-=-
+
+-=-=- SUN -=-=-
+
+-=-=- Caltech Pedestrian -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

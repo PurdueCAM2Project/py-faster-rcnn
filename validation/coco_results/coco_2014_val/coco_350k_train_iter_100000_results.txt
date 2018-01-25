@@ -1,0 +1,95 @@
+~~~~ Mean and per-category AP @ IoU=[0.50,0.95] ~~~~
+19.4
+31.0
+15.7
+17.3
+24.4
+32.6
+40.4
+36.2
+16.5
+10.3
+8.1
+43.0
+43.7
+17.5
+10.1
+13.5
+38.1
+28.9
+31.8
+22.3
+22.9
+42.1
+45.2
+42.5
+48.1
+4.2
+14.1
+2.6
+12.3
+11.6
+27.1
+5.9
+9.1
+9.0
+13.7
+8.9
+13.3
+22.1
+16.0
+24.2
+13.0
+16.9
+18.1
+9.5
+2.6
+3.3
+19.9
+9.4
+8.7
+16.4
+15.3
+13.3
+8.2
+13.3
+34.3
+22.4
+15.4
+10.5
+21.8
+11.5
+25.3
+20.6
+36.8
+35.3
+32.7
+21.3
+6.5
+23.8
+13.2
+30.9
+18.8
+6.9
+17.4
+23.8
+2.5
+25.7
+15.0
+8.6
+22.3
+0.2
+2.4
+~~~~ Summary metrics ~~~~
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.194
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.392
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.174
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.052
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.212
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.300
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.210
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.309
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.315
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.101
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.359
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.497
