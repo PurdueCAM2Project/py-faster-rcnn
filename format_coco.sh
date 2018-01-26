@@ -1,10 +1,19 @@
 #!/bin/bash
 
-prefix="./validation/coco_results/coco_2014_val/"
-#prefix="./"
-fn="coco_ap_plot.dat"
+# only for coco since output format is different
 
-files=($(ls $prefix | grep coco | grep results ))
+DATASET=$1
+
+if [ "$DATASET" == "coco" ]
+then
+    prefix="./validation/coco/coco_2014_val/"    
+else
+    prefix="./validation/"$DATASET"/"   
+fi
+
+fn="./validation/dat_files/"$DATASET"_ap_plot.dat"
+
+files=($(ls $prefix | grep "$DATASET" | grep results ))
 echo "Number of files: ${#files[@]}"
 
 declare -a person_ap_p
