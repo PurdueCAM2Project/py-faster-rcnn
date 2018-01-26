@@ -17,6 +17,10 @@ def parse_rec(annopath,annotations):
         obj_struct['name'] = obj['lbl']
         if obj['occl'] == 1: bbox = obj['posv']
         else: bbox = obj['pos']
+        if obj['occl'] == 1 and type(obj['posv']) == int:
+            bbox = obj['pos']
+        elif obj['occl'] == 0 and type(obj['pos']) == int:
+            bbox = obj['posv']
         assert len(bbox) == 4, 'bounding box in not the correct length. annopath: {:s}'.format(annopath)
         obj_struct['bbox'] = [bbox[0],bbox[1],bbox[0]+bbox[2],bbox[1]+bbox[3]]
         objects.append(obj_struct)

@@ -263,6 +263,15 @@ class caltech(imdb):
         # Load object bounding boxes into a data frame.
         for ix, obj in enumerate(objs):
             name = obj['lbl'].lower().strip()
+
+            # get occluded box if we can
+            if obj['occl'] == 1: bbox = obj['posv']
+            else: bbox = obj['pos']
+            if obj['occl'] == 1 and type(obj['posv']) == int:
+                bbox = obj['pos']
+            elif obj['occl'] == 0 and type(obj['pos']) == int:
+                bbox = obj['posv']
+
             bbox = obj['pos']
             cls = self._class_to_ind["person"]
             x1 = bbox[0]
