@@ -37,20 +37,36 @@ def parse_rec(filename):
 """
 
 def parse_rec(filename):
-    """ Parse a PASCAL VOC xml file """
-    tree = ET.parse(filename)
-    objects = []
-    for obj in tree.findall('object'):
-        obj_struct = {}
-        obj_struct['name'] = obj.find('name').text
-        bbox = obj.find('bndbox')
-        obj_struct['bbox'] = [int(bbox.find('xmin').text),
-                              int(bbox.find('ymin').text),
-                              int(bbox.find('xmax').text),
-                              int(bbox.find('ymax').text)]
-        objects.append(obj_struct)
-
-    return objects
+        """
+        Load image and bounding boxes info from TXT file in the KITTI VOC
+        format.
+        """
+        with open(filename,"r") as f:
+            annos = f.readlines()
+        cleaned = [
+            obj for obj in annos \
+            if "Misc" not in obj.split()[0].strip() and
+            "DontCare" not in obj.split()[0].strip()
+        ]
+        annos = cleaned
+        num_objs = len(annos)
+        boxes = np.zeros((num_objs, 4), dtype=np.uint16)
+        objects = []
+        # Load object bounding boxes into a data frame.
+        for obj in annos:
+            obj = obj.strip().split()
+            obj[0] = obj[0].lower()
+            if obj[0] in ["pedestrian","person_sitting","cyclist"]:
+                obj[0] = "person"
+            obj_struct = {}
+            obj_struct['name'] = obj[0]
+            x1 = float(obj[4])
+            y1 = float(obj[5])
+            x2 = float(obj[6])
+            y2 = float(obj[7])
+            obj_struct['bbox'] = [x1, y1, x2, y2]
+            objects.append(obj_struct)
+        return objects
 
 
 def voc_ap(rec, prec, clsnm,use_07_metric=False):
@@ -166,20 +182,13 @@ def kitti_eval(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
-    accepting_classes = ["person occluded","person sitting occluded","person", "person standing","person walking","person crop","person sitting","person sitting crop"]
-
     for imagename in imagenames:
-        # for obj in recs[imagename]:
-        #     print(obj['name'],obj['name'] in accepting_classes)
-        R = [obj for obj in recs[imagename] if obj['name'] in accepting_classes] # see ~/Documents/data/sun/SUN2012/Annotations/objects_interest.txt
-        #R = [obj for obj in recs[imagename] if obj['name'] in accepting_classes] # see ~/Documents/data/sun/SUN2012/Annotations/objects_interest.txt
+        R = [obj for obj in recs[imagename] if obj['name'] == classname]
         bbox = np.array([x['bbox'] for x in R])
         npos = npos + len(bbox)
         det = [False] * len(R)
         class_recs[imagename] = {'bbox': bbox,
                                  'det': det}
-
-    print("Should be about 12364 bboxes... --> ",len(class_recs))
     # read dets
     detfile = detpath.format(classname)
     with open(detfile, 'r') as f:

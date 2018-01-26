@@ -13,7 +13,7 @@ do
 done
 	    
 # WRITTEN AND USED [01/25/2018]
-# run caltech dataset "reval.py" since the evaluation of detections failed on the intial running of the code. see git commit   for caltech fix
+# run caltech dataset "reval.py" since the evaluation of detections failed on the intial running of the code. see git commit eb8c5f for caltech fix
 # for the moment change to manage the non-running issue...
 # files=($(ls output/faster_rcnn_end2end/caltech_2009_test/))
 # for file in "${files[@]}"

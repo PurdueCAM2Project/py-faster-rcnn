@@ -283,7 +283,7 @@ class kitti(imdb):
             self._devkit_path,
             'KITTI' + self._year,
             'label_2',
-            '{:s}.xml')
+            '{:s}.txt')
         imagesetfile = os.path.join(
             self._devkit_path,
             'KITTI' + self._year,
