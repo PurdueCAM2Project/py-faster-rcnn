@@ -1,4 +1,4 @@
-[submodule "caffe-fast-rcnn"]
+[submodule "caffe-cam2-faster-rcnn"]
 	path = caffe-fast-rcnn
-	url = https://github.com/rbgirshick/caffe-fast-rcnn.git
-	branch = fast-rcnn
+	url = https://github.com/PurdueCAM2Project/caffe
+	branch = cam2

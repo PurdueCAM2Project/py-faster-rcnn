@@ -47,6 +47,9 @@ class SolverWrapper(object):
         if solver_state is not None:
             print("Loading solver state from {:s}".format(solver_state))
             self.solver.restore(solver_state)
+            # tmp = "".join(solver_state.split(".")[0:2])
+            # print("Loading solver state from {:s}".format(tmp))
+            # self.solver.restore(tmp)
 
         if pretrained_model is not None:
             print ('Loading pretrained model '

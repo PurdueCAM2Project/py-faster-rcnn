@@ -95,7 +95,7 @@ time ./tools/train_net.py --gpu ${GPU_ID} \
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
   --cfg experiments/cfgs/faster_rcnn_end2end.yml \
-  #--solver_state ${SS} \
+  --solver_state ${SS} \
   ${EXTRA_ARGS}
 
 set +x
