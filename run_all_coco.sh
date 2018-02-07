@@ -13,7 +13,7 @@ do
 	
     # done
 
-    if [ $counter -gt 48 ]
+    if [ $counter -gt 71 ]
     then
 	fn=$fn"_results.txt"
 	echo $fn

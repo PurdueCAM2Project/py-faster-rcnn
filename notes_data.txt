@@ -9,8 +9,8 @@
 
 -=-=- TRAINING & VALIDATION -=-=-
 
-Iterations: about 400k
-Rational: at 400k, the ap@95 stopped increasing
+Iterations: 270k
+Rational: at 270k, the ap@75 peaked
 Plotting: 'plot_imagenet.p' (uncomment the "#*.png" command)
 File: "imagenet_validation.png"
 
@@ -71,10 +71,12 @@ File:
 -=-=- VOC -=-=-
 ###############
 
+# people annos: 28076 = 10675 ('07) + 17401 ('12')
+
 -=-=- TRAINING & VALIDATION -=-=-
 
-Iterations:
-Rational:
+Iterations: 70k
+Rational: The ap@75 peaked 
 Plotting: 
 File:
 
@@ -85,6 +87,31 @@ File:
 -=-=- SUN -=-=-
 
 -=-=- Caltech Pedestrian -=-=-
+
+-=-=- CAM2 -=-=-
+
+-=-=- INRIA -=-=-
+
+-=-=- KITTI -=-=-
+
+##############################
+-=-=- Caltech Pedestrian -=-=-
+##############################
+
+-=-=- TRAINING & VALIDATION -=-=-
+
+Iterations: 440k
+Rational: at 440k there was a significant peak at for ap@95 (ap~=0.091)
+Plotting: 
+File:
+
+-=-=- ImageNet -=-=-
+
+-=-=- COCO -=-=-
+
+-=-=- VOC -=-=-
+
+-=-=- SUN -=-=-
 
 -=-=- CAM2 -=-=-
 
@@ -99,78 +126,22 @@ File:
 
 -=-=- TRAINING & VALIDATION -=-=-
 
-Iterations:
-Rational:
-Plotting: 
-File:
+Note enough annotations to train a model
 
--=-=- ImageNet -=-=-
-
--=-=- COCO -=-=-
-
--=-=- VOC -=-=-
-
--=-=- Caltech Pedestrian -=-=-
-
--=-=- CAM2 -=-=-
-
--=-=- INRIA -=-=-
-
--=-=- KITTI -=-=-
-
-
-##############################
--=-=- Caltech Pedestrian -=-=-
-##############################
-
--=-=- TRAINING & VALIDATION -=-=-
-
-
-Iterations:
-Rational:
-Plotting: 
-File:
-
--=-=- ImageNet -=-=-
-
--=-=- COCO -=-=-
-
--=-=- VOC -=-=-
-
--=-=- SUN -=-=-
-
--=-=- CAM2 -=-=-
-
--=-=- INRIA -=-=-
-
--=-=- KITTI -=-=-
-
+6202 instances of people
 
 #################
 -=-=- KITTI -=-=-
 #################
 
-
 -=-=- TRAINING & VALIDATION -=-=-
 
-Iterations:
-Rational:
-Plotting: 
-File:
+Note enough annotations to train a model
 
--=-=- ImageNet -=-=-
+4487 of Pedestrian
+6336 annotations of people related classes (Person_sitting + Pedestrain + Cyclist)
 
--=-=- COCO -=-=-
 
--=-=- VOC -=-=-
-
--=-=- SUN -=-=-
-
--=-=- Caltech Pedestrian -=-=-
-
--=-=- CAM2 -=-=-
-
--=-=- INRIA -=-=-
 
 
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-files=($(ls output/faster_rcnn_end2end/kitti_2013_train/kitti_*caffemodel))
+files=($(ls output/faster_rcnn_end2end/kitti_2013_train/kitti3_*caffemodel))
 for file in "${files[@]}"
 do
     fn=$(echo $file | rev | cut -d'/' -f1 | cut -d'.' -f2 | rev)

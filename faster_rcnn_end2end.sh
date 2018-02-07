@@ -76,7 +76,8 @@ case $DATASET in
 	TRAIN_IMDB="kitti_2013_train"
 	TEST_IMDB="kitti_2013_val"
 	PT_DIR="kitti"
-	ITERS=70000
+	#ITERS=150000
+	ITERS=200000
 	;;
     *)
 	echo "No dataset given"
@@ -95,8 +96,8 @@ time ./tools/train_net.py --gpu ${GPU_ID} \
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
   --cfg experiments/cfgs/faster_rcnn_end2end.yml \
-  --solver_state ${SS} \
-  ${EXTRA_ARGS}
+  # --solver_state ${SS} \
+  # ${EXTRA_ARGS}
 
 set +x
 NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`

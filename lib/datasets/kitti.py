@@ -40,15 +40,13 @@ class kitti(imdb):
         self._data_path = os.path.join(self._devkit_path, 'KITTI' + self._year)
 
         self._classes = ('__background__', # always index 0
-                         'person',
-                         'car',
-                         'tram',
-                         'truck',
-                         'van')
+                         'person')
 
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.png'
         self._image_index = self._load_image_set_index()
+        self._image_path = os.path.join(self._data_path, 'image_2',
+                                  '{}' + self._image_ext)
         # Default to roidb handler
         self._roidb_handler = self.selective_search_roidb
         self._salt = str(uuid.uuid4())
@@ -61,7 +59,8 @@ class kitti(imdb):
                        'matlab_eval' : False,
                        'rpn_file'    : None,
                        'min_size'    : 2,
-                       'clean_annotations' : True}
+                       'clean_annotations' : True,
+                       'only_people' : True}
 
         assert os.path.exists(self._devkit_path), \
                 'KITTI path does not exist: {}'.format(self._devkit_path)
@@ -208,6 +207,12 @@ class kitti(imdb):
             ]
             annos = cleaned
 
+        if self.config['only_people']:
+            only_people = [
+                obj for obj in annos \
+                if obj.split()[0].strip().lower() in ["pedestrian","person_sitting","cyclist"]]
+            annos = only_people
+
         num_objs = len(annos)
         boxes = np.zeros((num_objs, 4), dtype=np.uint16)
         gt_classes = np.zeros((num_objs), dtype=np.int32)
@@ -221,7 +226,9 @@ class kitti(imdb):
             obj[0] = obj[0].lower()
             if obj[0] in ["pedestrian","person_sitting","cyclist"]:
                 obj[0] = "person"
-            bbox = obj
+            else:
+                print("Failure of checking.... want only people")
+                sys.exit(1)
             cls = self._class_to_ind[obj[0]]
 
             x1 = float(obj[4])
@@ -264,12 +271,15 @@ class kitti(imdb):
                 continue
             print 'Writing {} KITTI results file'.format(cls)
             filename = self._get_kitti_results_file_template().format(cls)
-            print(filename)
+            # print(filename)
+            # print(len(all_boxes),len(all_boxes[0]))
+            # for i in range(len(all_boxes)):
+            #     print(len(all_boxes[i]))
             with open(filename, 'wt') as f:
                 for im_ind, index in enumerate(self.image_index):
                     dets = all_boxes[cls_ind][im_ind]
-                    if dets == []:
-                        print("NOTHING")
+                    if len(dets) == 0:
+                        #print("NOTHING")
                         continue
                     # i am not sure if KITTI is "+1" or not so I will just be consistent with "+0"
                     for k in xrange(dets.shape[0]):
@@ -305,7 +315,7 @@ class kitti(imdb):
             filename = self._get_kitti_results_file_template().format(cls)
             rec, prec, ap, ovthresh = kitti_eval(
                 filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
-                use_07_metric=use_07_metric)
+                use_07_metric=use_07_metric,imagepath=self._image_path)
             aps += [ap]
         aps = np.array(aps)
         results_fd = open("./results_kitti.txt","w")
@@ -366,6 +376,13 @@ class kitti(imdb):
 
     def evaluate_detections(self, all_boxes, output_dir):
         self._write_kitti_results_file(all_boxes)
+        print(len(all_boxes))
+        for i in range(len(all_boxes)):
+            n = 0
+            for j in range(len(all_boxes[i])):
+                n += len(all_boxes[i][j])
+            print("{}: {}".format(i,n))
+
         self._do_python_eval(output_dir)
         if self.config['matlab_eval']:
             self._do_matlab_eval(output_dir)

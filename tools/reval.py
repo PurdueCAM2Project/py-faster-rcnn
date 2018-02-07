@@ -9,6 +9,10 @@
 
 """Reval = re-eval. Re-evaluate saved detections."""
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 import _init_paths
 from fast_rcnn.test import apply_nms
 from fast_rcnn.config import cfg
@@ -16,6 +20,8 @@ from datasets.factory import get_imdb
 import cPickle
 import os, sys, argparse
 import numpy as np
+
+
 
 def parse_args():
     """

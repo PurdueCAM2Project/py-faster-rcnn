@@ -18,6 +18,11 @@ import argparse
 import pprint
 import time, os, sys
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+
 def parse_args():
     """
     Parse input arguments

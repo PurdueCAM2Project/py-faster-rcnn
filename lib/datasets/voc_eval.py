@@ -39,7 +39,7 @@ def voc_ap(rec, prec, clsnm,use_07_metric=False,viz=False):
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
 
-    use_07_metric = True
+    use_07_metric = False
 
     if use_07_metric:
         # 11 point metric
@@ -55,7 +55,8 @@ def voc_ap(rec, prec, clsnm,use_07_metric=False,viz=False):
         # first append sentinel values at the end
         mrec = np.concatenate(([0.], rec, [1.]))
         mpre = np.concatenate(([0.], prec, [0.]))
-        plt.plot(mrec,mpre,"g.")
+        if viz:
+            plt.plot(mrec,mpre,"g.")
 
         # compute the precision envelope
         for i in range(mpre.size - 1, 0, -1):
@@ -70,7 +71,7 @@ def voc_ap(rec, prec, clsnm,use_07_metric=False,viz=False):
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
         if viz:
-            plt.plot(mrec,mpre,"ro",mrec,ap,"g^")
+            # plt.plot(mrec,mpre,"ro",mrec,ap,"g^")
             plt.plot(mrec,mpre,"r+")
             plt.tight_layout()
             plt.xlabel('Recall')

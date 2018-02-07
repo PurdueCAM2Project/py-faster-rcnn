@@ -19,6 +19,9 @@ import cPickle
 from utils.blob import im_list_to_blob
 import os
 
+SSD = False
+SSD_img_size= 300
+
 def _get_image_blob(im):
     """Converts an image into a network input.
 
@@ -45,6 +48,11 @@ def _get_image_blob(im):
         # Prevent the biggest axis from being more than MAX_SIZE
         if np.round(im_scale * im_size_max) > cfg.TEST.MAX_SIZE:
             im_scale = float(cfg.TEST.MAX_SIZE) / float(im_size_max)
+
+        if SSD == True:
+            im_scale_x = float(SSD_img_size) / float(im_shape[1])
+            im_scale_y = float(SSD_img_size) / float(im_shape[0])
+
         im = cv2.resize(im_orig, None, None, fx=im_scale, fy=im_scale,
                         interpolation=cv2.INTER_LINEAR)
         im_scale_factors.append(im_scale)
@@ -132,44 +140,66 @@ def im_detect(net, im, boxes=None):
         blobs['rois'] = blobs['rois'][index, :]
         boxes = boxes[index, :]
 
-    if cfg.TEST.HAS_RPN:
+    if cfg.TEST.HAS_RPN and SSD is False:
         im_blob = blobs['data']
         blobs['im_info'] = np.array(
             [[im_blob.shape[2], im_blob.shape[3], im_scales[0]]],
             dtype=np.float32)
 
     # reshape network inputs
-    net.blobs['data'].reshape(*(blobs['data'].shape))
-    if cfg.TEST.HAS_RPN:
+    if SSD is False:
+        net.blobs['data'].reshape(*(blobs['data'].shape))
+
+    #print(net.blobs['data'].data.shape)
+    if cfg.TEST.HAS_RPN and SSD is False:
         net.blobs['im_info'].reshape(*(blobs['im_info'].shape))
-    else:
+    elif SSD is False:
         net.blobs['rois'].reshape(*(blobs['rois'].shape))
 
     # do forward
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
-    if cfg.TEST.HAS_RPN:
+    if cfg.TEST.HAS_RPN and SSD is False:
         forward_kwargs['im_info'] = blobs['im_info'].astype(np.float32, copy=False)
-    else:
+    elif SSD is False:
         forward_kwargs['rois'] = blobs['rois'].astype(np.float32, copy=False)
+
     blobs_out = net.forward(**forward_kwargs)
 
-    if cfg.TEST.HAS_RPN:
+    if cfg.TEST.HAS_RPN and SSD is False:
         assert len(im_scales) == 1, "Only single-image batch implemented"
         rois = net.blobs['rois'].data.copy()
         # unscale back to raw image space
         boxes = rois[:, 1:5] / im_scales[0]
+    elif SSD is True:
+        #assert len(im_scales) == 1, "Only single-image batch implemented"
+        rois = net.blobs['detection_out'].data.copy()
+        # unscale back to raw image space
+        boxes = rois[0,0,:, 3:] * SSD_img_size
+        boxes[:,0] = boxes[:,0] / im_scales[0][0]
+        boxes[:,1] = boxes[:,1] / im_scales[0][1]
+        boxes[:,2] = boxes[:,2] / im_scales[0][0]
+        boxes[:,3] = boxes[:,3] / im_scales[0][1]
+
 
     if cfg.TEST.SVM:
         # use the raw scores before softmax under the assumption they
         # were trained as linear SVMs
         scores = net.blobs['cls_score'].data
-    else:
+    elif SSD is False:
         # use softmax estimated probabilities
         scores = blobs_out['cls_prob']
+    elif SSD is True:
+        scores = np.zeros((len(boxes),201))
+        for row in range(len(rois[0,0,:,2])):
+            scores[row,rois[0,0,row, 1].astype(int)] = rois[0,0,row, 2]
 
-    if cfg.TEST.BBOX_REG:
+    if cfg.TEST.BBOX_REG and SSD is False:
         # Apply bounding-box regression deltas
         box_deltas = blobs_out['bbox_pred']
+        pred_boxes = bbox_transform_inv(boxes, box_deltas)
+        pred_boxes = clip_boxes(pred_boxes, im.shape)
+    elif SSD is True:
+        box_deltas = np.zeros((len(boxes),804)) ##CHANGE IF DIFF NUM OF CLASS
         pred_boxes = bbox_transform_inv(boxes, box_deltas)
         pred_boxes = clip_boxes(pred_boxes, im.shape)
     else:
@@ -290,6 +320,13 @@ def test_net(net, imdb, max_per_image=100, thresh=1/80., vis=False):
     det_file = os.path.join(output_dir, 'detections.pkl')
     with open(det_file, 'wb') as f:
         cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+
+    print(len(all_boxes))
+    for i in range(len(all_boxes)):
+        n = 0
+        for j in range(len(all_boxes[i])):
+            n += len(all_boxes[i][j])
+        print("{}: {}".format(i,n))
 
     print 'Evaluating detections'
     imdb.evaluate_detections(all_boxes, output_dir)

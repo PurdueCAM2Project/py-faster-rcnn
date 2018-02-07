@@ -44,17 +44,15 @@ class SolverWrapper(object):
 
         self.solver = caffe.SGDSolver(solver_prototxt)
         
-        if solver_state is not None:
-            print("Loading solver state from {:s}".format(solver_state))
-            self.solver.restore(solver_state)
-            # tmp = "".join(solver_state.split(".")[0:2])
-            # print("Loading solver state from {:s}".format(tmp))
-            # self.solver.restore(tmp)
-
         if pretrained_model is not None:
             print ('Loading pretrained model '
                    'weights from {:s}').format(pretrained_model)
             self.solver.net.copy_from(pretrained_model)
+
+        print("solver_state: {}".format(solver_state))
+        if solver_state is not None:
+            print("Loading solver state from {:s}".format(solver_state))
+            self.solver.restore(solver_state)
 
         self.solver_param = caffe_pb2.SolverParameter()
         with open(solver_prototxt, 'rt') as f:
@@ -96,10 +94,6 @@ class SolverWrapper(object):
         print 'Wrote snapshot to: {:s}'.format(filename)
 
         # save solverstate 
-        filename = (self.solver_param.snapshot_prefix + infix +
-                    '_iter_{:d}'.format(self.solver.iter) + '.solverstate')
-        filename = os.path.join(self.output_dir, filename)
-
         self.solver.save(str(filename))
 
         print 'Wrote snapshot of solversate to: {:s}'\
@@ -117,7 +111,7 @@ class SolverWrapper(object):
         timer = Timer()
         model_paths = []
 
-        print(self.snapshot())
+        # print(self.snapshot())
         while self.solver.iter < max_iters:
             # Make one SGD update
             timer.tic()

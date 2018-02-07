@@ -63,7 +63,7 @@ for year in ['2009']:
 
 # Set up kitti_2013_<split>
 for year in ['2013']:
-    for split in ['val','train','all']:
+    for split in ['val','train','all','taste']:
         name = 'kitti_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year: kitti(split, year))
 

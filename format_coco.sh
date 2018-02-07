@@ -6,7 +6,8 @@ DATASET=$1
 
 if [ "$DATASET" == "coco" ]
 then
-    prefix="./validation/coco/coco_2014_val/"    
+    #prefix="./validation/coco/coco_2014_val/"    
+    prefix="./validation/coco/coco_2015_test-dev/"    
 else
     prefix="./validation/"$DATASET"/"   
 fi
