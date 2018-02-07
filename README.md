@@ -1,5 +1,5 @@
 ### CAM2 Modified Faster-RCNN
-1;4205;0c
+
 To install on the HELPS machine, directions are below:
 
 ```Shell
