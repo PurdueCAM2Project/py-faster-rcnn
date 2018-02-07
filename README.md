@@ -3,13 +3,13 @@
 To install on the HELPS machine, directions are below:
 
 ```Shell
-  git clone --recusive https://github.com/PurdueCAM2Project/py-faster-rcnn.git
+ git clone --recusive https://github.com/PurdueCAM2Project/py-faster-rcnn.git
  cd py-faster-rcnn/caffe-fast-rcnn/
  make all -j8
  make pycaffe -j8
  cd ../lib
  pip install cython --user
- make (edited)
+ make
 ```
 
 ### Disclaimer
