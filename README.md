@@ -28,8 +28,6 @@ import caffe
 
 If it doesn't spit anything out, you're good to go!
 
-If you get an error
-
 ### Disclaimer
 
 The official Faster R-CNN code (written in MATLAB) is available [here](https://github.com/ShaoqingRen/faster_rcnn).
