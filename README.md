@@ -7,10 +7,28 @@ To install on the HELPS machine, directions are below:
  cd py-faster-rcnn/caffe-fast-rcnn/
  make all -j8
  make pycaffe -j8
- cd ../lib
+ cd python
+ cat requirements.txt | xargs pip install --user
+ cd ../../lib
  pip install cython --user
  make
 ```
+
+Then add it to your PYTHONPATH
+
+```Shell
+export PYTHONPATH=<pathToCaffeInstall>/py-faster-rcnn/caffe-fast-rcnn/python
+```
+
+Then open it up in your python2 interpreter by typing `python2` and type:
+
+```python
+import caffe
+```
+
+If it doesn't spit anything out, you're good to go!
+
+If you get an error
 
 ### Disclaimer
 
