@@ -8,7 +8,8 @@ To install on the HELPS machine, directions are below:
  make all -j8
  make pycaffe -j8
  cd python
- cat requirements.txt | xargs pip install --user
+ cat requirements.txt | xargs pip2 install --user
+ pip2 install libprotoc==3.6.1 --user
  cd ../../lib
  pip install cython --user
  make
